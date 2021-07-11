@@ -74,7 +74,7 @@ public class FigureSpawner : MonoBehaviour
     /// <returns> type of tetris figure </returns>
     private FigureTypes GetRandomFigureType()
     {
-        int between = Random.Range(0, ((int)FigureTypes.End - 1));
+        int between = Random.Range(0, ((int)FigureTypes.End));
         return (FigureTypes)between;
     }
 
