@@ -30,6 +30,7 @@ public class Figure : MonoBehaviour
                 // If we can't fall figure more, it means figure is grounded
                 // Spawn new figure and destroy FigureComponent
                 transform.position += Vector3.up;
+                AddToGrid();
                 FigureSpawner spawner = GameObject.FindGameObjectWithTag(FigureSpawner.Tag).GetComponent<FigureSpawner>();
                 spawner.SpawnFigure();
                 Destroy(GetComponent<Figure>());
@@ -51,6 +52,11 @@ public class Figure : MonoBehaviour
             int roundedY = Mathf.RoundToInt(child.transform.position.y);
 
             if (roundedX < 0 || roundedX >= TetrisState.GameWidth || roundedY < 0 || roundedY >= TetrisState.GameHeight)
+            {
+                return false;
+            }
+
+            if (TetrisState.Grid[roundedX, roundedY] != null)
             {
                 return false;
             }
@@ -95,6 +101,20 @@ public class Figure : MonoBehaviour
             {
                 transform.Rotate(Vector3.forward, -90.0f);
             }
+        }
+    }
+
+    /// <summary>
+    /// Add each block of figure to tetris grid.
+    /// </summary>
+    private void AddToGrid()
+    {
+        foreach (Transform child in transform)
+        {
+            int roundedX = Mathf.RoundToInt(child.transform.position.x);
+            int roundedY = Mathf.RoundToInt(child.transform.position.y);
+
+            TetrisState.Grid[roundedX, roundedY] = child;
         }
     }
 }
