@@ -25,7 +25,7 @@ public class Figure : MonoBehaviour
         // If Time.time - previousTime > fallSpeed
         // change figure position down for 1 unit;
         if (Time.time - _previousTime > (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)
-                ? TetrisState.FallSpeed / 30 : TetrisState.FallSpeed))
+                ? TetrisState.ForceFallSpeed : TetrisState.FallSpeed))
         {
             transform.position += Vector3.down;
             if (!IsValidMove())

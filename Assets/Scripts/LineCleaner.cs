@@ -1,4 +1,10 @@
+using System;
 using UnityEngine;
+
+public class LinesBurnedEvent : EventArgs
+{
+    public int LinesBurnedCount = 0;
+}
 
 public class LineCleaner : MonoBehaviour
 {
@@ -6,6 +12,11 @@ public class LineCleaner : MonoBehaviour
     /// Getter/setter for GameObject's tag with which is connected LineCleaner
     /// </summary>
     public static string Tag { get; private set; }
+
+    /// <summary>
+    /// Event handler which will broadcast burned lines event
+    /// </summary>
+    public static event EventHandler onLineWasBurned;
     private void Awake()
     {
         Tag = this.gameObject.tag;
@@ -16,14 +27,20 @@ public class LineCleaner : MonoBehaviour
     /// </summary>
     public void ClearFullLines()
     {
+        int linesBurnedCount = 0;
         for (int y = TetrisState.GameHeight - 1; y > -1 ; --y)
         {
             if (IsFullLine(y))
             {
                 DestroyLine(y);
                 DropBlocksAbove(y);
+                ++TetrisState.LinesWereBurned;
+                ++linesBurnedCount;
             }
         }
+        // invoke method increasing level & send event about burned lines
+        TetrisState.IncreaseLevel();
+        if (linesBurnedCount > 0) onLineWasBurned?.Invoke(this, new LinesBurnedEvent() { LinesBurnedCount = linesBurnedCount});
     }
 
     /// <summary>

@@ -9,6 +9,7 @@
           <e p="FigureSpawner.cs" t="Include" />
           <e p="LineCleaner.cs" t="Include" />
           <e p="TetrisState.cs" t="Include" />
+          <e p="UI.cs" t="Include" />
         </e>
       </e>
       <e p="obj" t="ExcludeRecursive" />
