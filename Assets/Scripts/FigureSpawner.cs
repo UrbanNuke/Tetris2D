@@ -11,14 +11,20 @@ public class FigureSpawner : MonoBehaviour
     private GameObject tile;
 
     /// <summary>
+    /// Container for tetris figure
+    /// </summary>
+    [SerializeField]
+    private GameObject figuresContainer;
+
+    /// <summary>
     /// Getter/setter for GameObject's tag with which is connected FigureSpawner
     /// </summary>
     public static string Tag { get; private set; }
 
     /// <summary>
-    /// Figure ID
+    /// Tile ID
     /// </summary>
-    private static int figureId = 0;
+    private static int tileId = 0;
 
     /// <summary>
     /// Base for tetris figure
@@ -55,13 +61,13 @@ public class FigureSpawner : MonoBehaviour
     /// </summary>
     public void SpawnFigure()
     {
-        _figureBase = new GameObject {name = $"Figure{figureId}"};
-        ++figureId;
+        _figureBase = new GameObject() {name = "Figure"};
+        _figureBase.transform.parent = figuresContainer.transform;
 
         _figureBase = CreateFigure(_figureBase, GetRandomFigureType());
-        _figureBase.AddComponent<Figure>();
+        _figureBase.AddComponent<Figure>().parent = figuresContainer.transform;
     }
-    
+
     /// <summary>
     /// Get random tetris figure type
     /// </summary>
@@ -80,8 +86,14 @@ public class FigureSpawner : MonoBehaviour
     /// <returns>Tetris figure</returns>
     private GameObject CreateFigure(GameObject baseObject, FigureTypes type)
     {
+        Color randColor = Random.ColorHSV(0.0f, 1.0f, 0.5f, 0.5f, 1.0f, 1.0f);
         foreach (Vector3 position in GetTilePositions(type))
-            Instantiate(tile, position, Quaternion.identity, baseObject.transform);
+        {
+            tile.GetComponent<SpriteRenderer>().color = randColor;
+            GameObject newTile = Instantiate(tile, position, Quaternion.identity, baseObject.transform);
+            newTile.name = $"Tile{tileId}";
+            ++tileId;
+        }
 
         baseObject.transform.position = transform.position;
 

@@ -1,9 +1,11 @@
-using System;
 using UnityEngine;
-
 
 public class Figure : MonoBehaviour
 {
+    /// <summary>
+    /// Parent for tiles, when figure was grounded
+    /// </summary>
+    public Transform parent;
     /// <summary>
     /// Snapshot of Time.time
     /// </summary>
@@ -28,15 +30,17 @@ public class Figure : MonoBehaviour
             if (!IsValidMove())
             {
                 // If we can't fall figure more, it means figure is grounded
-                // Spawn new figure and destroy FigureComponent
+                // Clear lines, spawn new figure and destroy this GameObject
                 transform.position += Vector3.up;
                 AddToGrid();
+                LineCleaner lineCleaner = GameObject.FindWithTag(LineCleaner.Tag).GetComponent<LineCleaner>();
+                lineCleaner.ClearFullLines();
+                
                 FigureSpawner spawner = GameObject.FindGameObjectWithTag(FigureSpawner.Tag).GetComponent<FigureSpawner>();
                 spawner.SpawnFigure();
-                Destroy(GetComponent<Figure>());
+                Destroy(this.gameObject);
             }
             _previousTime = Time.time;
-
         }
     }
 
@@ -109,11 +113,13 @@ public class Figure : MonoBehaviour
     /// </summary>
     private void AddToGrid()
     {
-        foreach (Transform child in transform)
+        while (transform.childCount > 0)
         {
+            Transform child = transform.GetChild(transform.childCount - 1);
             int roundedX = Mathf.RoundToInt(child.transform.position.x);
             int roundedY = Mathf.RoundToInt(child.transform.position.y);
 
+            child.SetParent(parent);
             TetrisState.Grid[roundedX, roundedY] = child;
         }
     }
