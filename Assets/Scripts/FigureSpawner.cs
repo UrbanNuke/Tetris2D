@@ -46,6 +46,10 @@ public class FigureSpawner : MonoBehaviour
         End
     }
 
+    // available rotations for figures
+    private readonly int[] _figureRotations = new int[] {90, 180, 270, 0};
+    private readonly int[] _IFigureRotations = new int[] {90, 270, 0};
+
     private void Awake()
     {
         Tag = this.gameObject.tag;
@@ -65,7 +69,7 @@ public class FigureSpawner : MonoBehaviour
         _figureBase.transform.parent = figuresContainer.transform;
 
         _figureBase = CreateFigure(_figureBase, GetRandomFigureType());
-        _figureBase.AddComponent<Figure>().parent = figuresContainer.transform;
+        _figureBase.AddComponent<Figure>().Parent = figuresContainer.transform;
     }
 
     /// <summary>
@@ -87,10 +91,24 @@ public class FigureSpawner : MonoBehaviour
     private GameObject CreateFigure(GameObject baseObject, FigureTypes type)
     {
         Color randColor = Random.ColorHSV(0.0f, 1.0f, 0.5f, 0.5f, 1.0f, 1.0f);
+        // Random rotation for base figure
+        // one exception for I figure, without 180 rotation to don't across top border
+        _figureBase.transform.Rotate(
+            Vector3.forward,
+            type == FigureTypes.I
+                ? _IFigureRotations[Random.Range(0, _IFigureRotations.Length)]
+                : _figureRotations[Random.Range(0, _figureRotations.Length)]
+        );
         foreach (Vector3 position in GetTilePositions(type))
         {
             tile.GetComponent<SpriteRenderer>().color = randColor;
-            GameObject newTile = Instantiate(tile, position, Quaternion.identity, baseObject.transform);
+            // transform world position to local, cause figure was rotated
+            GameObject newTile = Instantiate(
+                tile,
+                baseObject.transform.InverseTransformPoint(position),
+                Quaternion.identity,
+                baseObject.transform
+            );
             newTile.name = $"Tile{tileId}";
             ++tileId;
         }

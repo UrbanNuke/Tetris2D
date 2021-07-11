@@ -5,7 +5,8 @@ public class Figure : MonoBehaviour
     /// <summary>
     /// Parent for tiles, when figure was grounded
     /// </summary>
-    public Transform parent;
+    public Transform Parent { get; set; }
+
     /// <summary>
     /// Snapshot of Time.time
     /// </summary>
@@ -119,7 +120,7 @@ public class Figure : MonoBehaviour
             int roundedX = Mathf.RoundToInt(child.transform.position.x);
             int roundedY = Mathf.RoundToInt(child.transform.position.y);
 
-            child.SetParent(parent);
+            child.SetParent(Parent);
             TetrisState.Grid[roundedX, roundedY] = child;
         }
     }
