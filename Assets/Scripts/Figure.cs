@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -9,12 +7,12 @@ public class Figure : MonoBehaviour
     /// <summary>
     /// Snapshot of Time.time
     /// </summary>
-    private float previousTime;
+    private float _previousTime;
 
     // Start is called before the first frame update
     private void Start()
     {
-        previousTime = Time.time;
+        _previousTime = Time.time;
     }
     
     private void Update()
@@ -23,7 +21,7 @@ public class Figure : MonoBehaviour
 
         // If Time.time - previousTime > fallSpeed
         // change figure position down for 1 unit;
-        if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)
+        if (Time.time - _previousTime > (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)
                 ? TetrisState.FallSpeed / 30 : TetrisState.FallSpeed))
         {
             transform.position += Vector3.down;
@@ -36,7 +34,7 @@ public class Figure : MonoBehaviour
                 spawner.SpawnFigure();
                 Destroy(GetComponent<Figure>());
             }
-            previousTime = Time.time;
+            _previousTime = Time.time;
 
         }
     }
@@ -72,7 +70,6 @@ public class Figure : MonoBehaviour
             if (!IsValidMove())
                 transform.position += Vector3.right;
                         
-            Debug.Log($"Result move left: {transform.position.x}");
         }
 
         if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
@@ -81,14 +78,23 @@ public class Figure : MonoBehaviour
             if (!IsValidMove())
                 transform.position += Vector3.left;
                         
-            Debug.Log($"Result move right: {transform.position.x}");
         }
 
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
         {
             transform.Rotate(Vector3.forward, 90.0f);
-            if (!IsValidMove())
+            if (IsValidMove())
+            {
+                foreach (Transform child in transform)
+                {
+                    child.Rotate(Vector3.forward, -90.0f);
+                }   
+
+            }
+            else
+            {
                 transform.Rotate(Vector3.forward, -90.0f);
+            }
         }
     }
 }

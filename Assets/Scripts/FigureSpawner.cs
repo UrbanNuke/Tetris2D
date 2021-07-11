@@ -55,8 +55,7 @@ public class FigureSpawner : MonoBehaviour
     /// </summary>
     public void SpawnFigure()
     {
-        _figureBase = Instantiate(tile);
-        _figureBase.name = $"Figure{figureId}";
+        _figureBase = new GameObject {name = $"Figure{figureId}"};
         ++figureId;
 
         _figureBase = CreateFigure(_figureBase, GetRandomFigureType());
@@ -99,13 +98,13 @@ public class FigureSpawner : MonoBehaviour
     {
         return type switch
         {
-            FigureTypes.I => new Vector3[] {Vector3.up, Vector3.down, new Vector3(0.0f, -2.0f)},
-            FigureTypes.J => new Vector3[] {Vector3.left, Vector3.right, new Vector3(1.0f, -1.0f)},
-            FigureTypes.L => new Vector3[] {Vector3.left, Vector3.right, new Vector3(-1.0f, -1.0f)},
-            FigureTypes.O => new Vector3[] {Vector3.down, new Vector3(-1.0f, -1.0f), Vector3.left},
-            FigureTypes.S => new Vector3[] {Vector3.right, Vector3.down, new Vector3(-1.0f, -1.0f)},
-            FigureTypes.T => new Vector3[] {Vector3.left, Vector3.right, Vector3.down},
-            FigureTypes.Z => new Vector3[] {Vector3.left, Vector3.down, new Vector3(1.0f, -1.0f)},
+            FigureTypes.I => new Vector3[] {Vector3.zero, Vector3.up, Vector3.down, new Vector3(0.0f, -2.0f)},
+            FigureTypes.J => new Vector3[] {Vector3.zero, Vector3.left, Vector3.right, new Vector3(1.0f, -1.0f)},
+            FigureTypes.L => new Vector3[] {Vector3.zero, Vector3.left, Vector3.right, new Vector3(-1.0f, -1.0f)},
+            FigureTypes.O => new Vector3[] {Vector3.zero, Vector3.down, new Vector3(-1.0f, -1.0f), Vector3.left},
+            FigureTypes.S => new Vector3[] {Vector3.zero, Vector3.right, Vector3.down, new Vector3(-1.0f, -1.0f)},
+            FigureTypes.T => new Vector3[] {Vector3.zero, Vector3.left, Vector3.right, Vector3.down},
+            FigureTypes.Z => new Vector3[] {Vector3.zero, Vector3.left, Vector3.down, new Vector3(1.0f, -1.0f)},
             _ => new Vector3[] {Vector3.right, Vector3.down, new Vector3(-1.0f, -1.0f)}
         };
     }

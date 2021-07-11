@@ -53,8 +53,8 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\FigureSpawner.cs" />
-     <Compile Include="Assets\Scripts\Figure.cs" />
      <Compile Include="Assets\Scripts\TetrisState.cs" />
+     <Compile Include="Assets\Scripts\Figure.cs" />
  <Reference Include="UnityEngine">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.13f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
  </Reference>
