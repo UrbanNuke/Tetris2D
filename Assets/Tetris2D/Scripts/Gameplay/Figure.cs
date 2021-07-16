@@ -32,30 +32,6 @@ namespace Tetris2D
         private void Update()
         {
             InputHandler();
-
-            // If Time.time - previousTime > fallSpeed
-            // change figure position down for 1 unit;
-            if (Time.time - _previousTime > (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)
-                ? TetrisState.ForceFallSpeed
-                : TetrisState.FallSpeed))
-            {
-                transform.position += Vector3.down;
-                if (!IsValidMove())
-                {
-                    // If we can't fall figure more, it means figure is grounded
-                    // Clear lines, spawn new figure and destroy this GameObject
-                    transform.position += Vector3.up;
-                    AddToGrid();
-                    LineCleaner lineCleaner = GameObject.FindWithTag(LineCleaner.Tag).GetComponent<LineCleaner>();
-                    lineCleaner.ClearFullLines();
-
-                    FigureSpawner spawner = GameObject.FindGameObjectWithTag(FigureSpawner.Tag).GetComponent<FigureSpawner>();
-                    spawner.SpawnFigure();
-                    Destroy(this.gameObject);
-                }
-
-                _previousTime = Time.time;
-            }
         }
 
         #endregion
@@ -92,6 +68,7 @@ namespace Tetris2D
         /// </summary>
         private void InputHandler()
         {
+            if (TetrisState.GameState != GameState.Play) return;
             if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 transform.position += Vector3.left;
@@ -120,6 +97,31 @@ namespace Tetris2D
                 {
                     transform.Rotate(Vector3.forward, -90.0f);
                 }
+            }
+            
+            
+            // If Time.time - previousTime > fallSpeed
+            // change figure position down for 1 unit;
+            if (Time.time - _previousTime > (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)
+                ? TetrisState.ForceFallSpeed
+                : TetrisState.FallSpeed))
+            {
+                transform.position += Vector3.down;
+                if (!IsValidMove())
+                {
+                    // If we can't fall figure more, it means figure is grounded
+                    // Clear lines, spawn new figure and destroy this GameObject
+                    transform.position += Vector3.up;
+                    AddToGrid();
+                    LineCleaner lineCleaner = GameObject.FindWithTag(LineCleaner.Tag).GetComponent<LineCleaner>();
+                    lineCleaner.ClearFullLines();
+
+                    FigureSpawner spawner = GameObject.FindGameObjectWithTag(FigureSpawner.Tag).GetComponent<FigureSpawner>();
+                    spawner.SpawnFigure();
+                    Destroy(this.gameObject);
+                }
+
+                _previousTime = Time.time;
             }
         }
 

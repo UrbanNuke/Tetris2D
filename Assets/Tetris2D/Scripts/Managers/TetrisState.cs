@@ -3,6 +3,17 @@ using UnityEngine;
 
 namespace Tetris2D
 {
+
+    /// <summary>
+    /// Different kind of game states
+    /// </summary>
+    public enum GameState
+    {
+        MainMenu,
+        Play,
+        Pause,
+        End
+    }
     /// <summary>
     /// Global Tetris state
     /// </summary>
@@ -50,6 +61,11 @@ namespace Tetris2D
         #region Properties
 
         /// <summary>
+        /// Current game state
+        /// </summary>
+        public static GameState GameState { get; private set; } = GameState.MainMenu; 
+
+        /// <summary>
         /// Total amount of lines which were burned
         /// </summary>
         public static int LinesWereBurned { get; set; } = 0;
@@ -72,7 +88,7 @@ namespace Tetris2D
         /// <summary>
         /// Getter/Setter for force figure's fall speed. When player press down button
         /// </summary>
-        public static float ForceFallSpeed { get; set; } = 0.013f;
+        public static float ForceFallSpeed { get; } = 0.013f;
 
         #endregion
 
@@ -103,6 +119,12 @@ namespace Tetris2D
             if (LinesWereBurned / LevelCost >= CurrentLevel && CurrentLevel != LevelSpeeds.Count)
                 FallSpeed = LevelSpeeds[++CurrentLevel];
         }
+
+        /// <summary>
+        /// Change current game state
+        /// </summary>
+        /// <param name="state">new state</param>
+        public static void ChangeGameState(GameState state) => GameState = state;
 
         #endregion
     }

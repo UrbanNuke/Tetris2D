@@ -26,6 +26,30 @@ namespace Tetris2D
         [SerializeField]
         private Text levelText;
 
+        /// <summary>
+        /// Start button
+        /// </summary>
+        [SerializeField]
+        private Button startButton;
+        
+        /// <summary>
+        /// Pause button
+        /// </summary>
+        [SerializeField]
+        private Button pauseButton;
+        
+        /// <summary>
+        /// Pause text
+        /// </summary>
+        [SerializeField]
+        private Text pauseText;
+        
+        /// <summary>
+        /// Start game event
+        /// </summary>
+        public delegate void StartGameHandler();
+        public static event StartGameHandler OnStartGame;
+
         #endregion
 
         #region LifeCycles
@@ -36,6 +60,58 @@ namespace Tetris2D
             linesWereBurnedText.text = "0";
             scoreText.text = "0";
             levelText.text = TetrisState.CurrentLevel.ToString();
+        }
+
+        private void LateUpdate()
+        {
+            switch (TetrisState.GameState)
+            {
+                case GameState.Play:
+                    startButton.interactable = false;
+                    pauseButton.interactable = true;
+                    break;
+                case GameState.Pause:
+                    break;
+                case GameState.MainMenu:
+                case GameState.End:
+                    startButton.interactable = true;
+                    pauseButton.interactable = false;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        #endregion
+        
+        #region PublicMethods
+
+        /// <summary>
+        /// Handle start button pressing 
+        /// </summary>
+        public void OnClickStart()
+        {
+            TetrisState.ChangeGameState(GameState.Play);
+            OnStartGame?.Invoke();
+        }
+
+        /// <summary>
+        /// Handle pause button pressing
+        /// </summary>
+        public void OnClickPause()
+        {
+            if (TetrisState.GameState == GameState.Play)
+            {
+                this.pauseText.enabled = true;
+                // Time.timeScale = 0;
+                TetrisState.ChangeGameState(GameState.Pause);
+            }
+            else
+            {
+                this.pauseText.enabled = false;
+                // Time.timeScale = 1;
+                TetrisState.ChangeGameState(GameState.Play);
+            }
         }
 
         #endregion

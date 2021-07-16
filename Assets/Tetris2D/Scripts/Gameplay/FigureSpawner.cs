@@ -65,7 +65,7 @@ namespace Tetris2D
 
         private void Start()
         {
-            SpawnFigure();
+            UI.OnStartGame += SpawnFigure;
         }
 
         #endregion
