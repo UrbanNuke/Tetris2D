@@ -7,9 +7,14 @@ namespace Tetris2D
         #region Fields
 
         /// <summary>
-        /// Snapshot of Time.time
+        /// Snapshot of Time.time for falling
         /// </summary>
-        private float _previousTime;
+        private float _previousFallTime;
+        
+        /// <summary>
+        /// Snapshot of Time.time for shifting
+        /// </summary>
+        private float _previousShiftTime;
 
         #endregion
 
@@ -26,7 +31,7 @@ namespace Tetris2D
 
         private void Start()
         {
-            _previousTime = Time.time;
+            _previousFallTime = Time.time;
         }
 
         private void Update()
@@ -49,12 +54,12 @@ namespace Tetris2D
                 int roundedX = Mathf.RoundToInt(child.transform.position.x);
                 int roundedY = Mathf.RoundToInt(child.transform.position.y);
 
-                if (roundedX < 0 || roundedX >= TetrisState.GameWidth || roundedY < 0 || roundedY >= TetrisState.GameHeight)
+                if (roundedX < 0 || roundedX >= GameManager.GameWidth || roundedY < 0 || roundedY >= GameManager.GameHeight)
                 {
                     return false;
                 }
 
-                if (TetrisState.Grid[roundedX, roundedY] != null)
+                if (GameManager.Instance.Grid[roundedX, roundedY] != null)
                 {
                     return false;
                 }
@@ -68,19 +73,24 @@ namespace Tetris2D
         /// </summary>
         private void InputHandler()
         {
-            if (TetrisState.GameState != GameState.Play) return;
-            if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+            if (GameManager.Instance.GameState != GameState.Play) return;
+            
+            if (Time.time - _previousShiftTime > GameManager.Instance.ShiftSpeed 
+                && (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)))
             {
                 transform.position += Vector3.left;
                 if (!IsValidMove())
                     transform.position += Vector3.right;
+                _previousShiftTime = Time.time;
             }
 
-            if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+            if (Time.time - _previousShiftTime > GameManager.Instance.ShiftSpeed 
+                && (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)))
             {
                 transform.position += Vector3.right;
                 if (!IsValidMove())
                     transform.position += Vector3.left;
+                _previousShiftTime = Time.time;
             }
 
             if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
@@ -102,9 +112,9 @@ namespace Tetris2D
             
             // If Time.time - previousTime > fallSpeed
             // change figure position down for 1 unit;
-            if (Time.time - _previousTime > (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)
-                ? TetrisState.ForceFallSpeed
-                : TetrisState.FallSpeed))
+            if (Time.time - _previousFallTime > (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)
+                ? GameManager.Instance.ForceFallSpeed
+                : GameManager.Instance.FallSpeed))
             {
                 transform.position += Vector3.down;
                 if (!IsValidMove())
@@ -113,15 +123,19 @@ namespace Tetris2D
                     // Clear lines, spawn new figure and destroy this GameObject
                     transform.position += Vector3.up;
                     AddToGrid();
+                    Destroy(this.gameObject);
                     LineCleaner lineCleaner = GameObject.FindWithTag(LineCleaner.Tag).GetComponent<LineCleaner>();
                     lineCleaner.ClearFullLines();
 
-                    FigureSpawner spawner = GameObject.FindGameObjectWithTag(FigureSpawner.Tag).GetComponent<FigureSpawner>();
-                    spawner.SpawnFigure();
-                    Destroy(this.gameObject);
+                    if (GameManager.Instance.GameState == GameState.Play)
+                    {
+                        FigureSpawner spawner = GameObject.FindGameObjectWithTag(FigureSpawner.Tag).GetComponent<FigureSpawner>();
+                        spawner.SpawnFigure();
+                    }
+
                 }
 
-                _previousTime = Time.time;
+                _previousFallTime = Time.time;
             }
         }
 
@@ -137,7 +151,7 @@ namespace Tetris2D
                 int roundedY = Mathf.RoundToInt(child.transform.position.y);
 
                 child.SetParent(Parent);
-                TetrisState.Grid[roundedX, roundedY] = child;
+                GameManager.Instance.Grid[roundedX, roundedY] = child;
             }
         }
 

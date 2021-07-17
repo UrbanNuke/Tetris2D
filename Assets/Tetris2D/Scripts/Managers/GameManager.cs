@@ -17,9 +17,15 @@ namespace Tetris2D
     /// <summary>
     /// Global Tetris state
     /// </summary>
-    public static class TetrisState
+    public class GameManager : MonoBehaviour
     {
         #region Fields
+
+        /// <summary>
+        /// Container for all figures on a level
+        /// </summary>
+        [SerializeField]
+        private GameObject figureContainer;
 
         /// <summary>
         /// Amount of column in the game field
@@ -34,7 +40,7 @@ namespace Tetris2D
         /// <summary>
         /// Map from level to level speed
         /// </summary>
-        private static readonly Dictionary<int, float> LevelSpeeds = new Dictionary<int, float>()
+        private readonly Dictionary<int, float> LevelSpeeds = new Dictionary<int, float>()
         {
             {1, 1.0f},
             {2, 0.8f},
@@ -49,7 +55,7 @@ namespace Tetris2D
         /// <summary>
         /// Tetris grid for store in which "cell" exist a block. [x, y]
         /// </summary>
-        public static Transform[,] Grid = new Transform[GameWidth, GameHeight];
+        public Transform[,] Grid = new Transform[GameWidth, GameHeight];
 
         /// <summary>
         /// Cost of the one level
@@ -61,34 +67,58 @@ namespace Tetris2D
         #region Properties
 
         /// <summary>
+        /// Instance GameManager
+        /// </summary>
+        public static GameManager Instance { get; private set; }
+        
+        /// <summary>
         /// Current game state
         /// </summary>
-        public static GameState GameState { get; private set; } = GameState.MainMenu; 
+        public GameState GameState { get; private set; } = GameState.MainMenu; 
 
         /// <summary>
         /// Total amount of lines which were burned
         /// </summary>
-        public static int LinesWereBurned { get; set; } = 0;
+        public int LinesWereBurned { get; set; } = 0;
 
         /// <summary>
         /// Total score of current game
         /// </summary>
-        public static int TotalScore { get; set; } = 0;
+        public int TotalScore { get; set; } = 0;
 
         /// <summary>
         /// Current level
         /// </summary>
-        public static int CurrentLevel { get; set; } = 1;
+        public int CurrentLevel { get; private set; } = 1;
 
         /// <summary>
         /// Getter/Setter for figure's fall speed
         /// </summary>
-        public static float FallSpeed { get; set; } = LevelSpeeds[CurrentLevel];
+        public float FallSpeed { get; private set; }
+
+        /// <summary>
+        /// Getter for shift speed
+        /// </summary>
+        public float ShiftSpeed { get; } = 0.11f;
 
         /// <summary>
         /// Getter/Setter for force figure's fall speed. When player press down button
         /// </summary>
-        public static float ForceFallSpeed { get; } = 0.013f;
+        public float ForceFallSpeed { get; } = 0.013f;
+
+        #endregion
+
+        #region LifeCycles
+
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+
+            FallSpeed = LevelSpeeds[CurrentLevel];
+        }
 
         #endregion
 
@@ -114,7 +144,7 @@ namespace Tetris2D
         /// <summary>
         /// Increase level of game
         /// </summary>
-        public static void IncreaseLevel()
+        public void IncreaseLevel()
         {
             if (LinesWereBurned / LevelCost >= CurrentLevel && CurrentLevel != LevelSpeeds.Count)
                 FallSpeed = LevelSpeeds[++CurrentLevel];
@@ -124,7 +154,18 @@ namespace Tetris2D
         /// Change current game state
         /// </summary>
         /// <param name="state">new state</param>
-        public static void ChangeGameState(GameState state) => GameState = state;
+        public void ChangeGameState(GameState state) => GameState = state;
+
+        public void Restart()
+        {
+            foreach (Transform child in figureContainer.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            Grid = new Transform[GameManager.GameWidth, GameManager.GameHeight];
+            CurrentLevel = 1;
+            FallSpeed = LevelSpeeds[CurrentLevel];
+        }
 
         #endregion
     }

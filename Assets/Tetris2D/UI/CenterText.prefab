@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5825559878096853133}
   - component: {fileID: -3877579049271184617}
   m_Layer: 5
-  m_Name: PauseText
+  m_Name: CenterText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -53,7 +53,7 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Tetris2D\Scripts\Gameplay\FigureSpawner.cs" />
-     <Compile Include="Assets\Tetris2D\Scripts\Managers\TetrisState.cs" />
+     <Compile Include="Assets\Tetris2D\Scripts\Managers\GameManager.cs" />
      <Compile Include="Assets\Tetris2D\Scripts\UI\UI.cs" />
      <Compile Include="Assets\Tetris2D\Scripts\Gameplay\Figure.cs" />
      <Compile Include="Assets\Tetris2D\Scripts\Gameplay\LineCleaner.cs" />

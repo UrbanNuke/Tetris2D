@@ -48,19 +48,24 @@ namespace Tetris2D
         public void ClearFullLines()
         {
             int linesBurnedCount = 0;
-            for (int y = TetrisState.GameHeight - 1; y > -1; --y)
+            for (int y = GameManager.GameHeight - 1; y > -1; --y)
             {
+                if (y == GameManager.GameHeight - 1 && IsTopLine(y))
+                {
+                    GameManager.Instance.ChangeGameState(GameState.End);
+                    return;
+                }
                 if (IsFullLine(y))
                 {
                     DestroyLine(y);
                     DropBlocksAbove(y);
-                    ++TetrisState.LinesWereBurned;
+                    ++GameManager.Instance.LinesWereBurned;
                     ++linesBurnedCount;
                 }
             }
 
             // invoke method increasing level & send event about burned lines
-            TetrisState.IncreaseLevel();
+            GameManager.Instance.IncreaseLevel();
             if (linesBurnedCount > 0) onLineWasBurned?.Invoke(this, new LinesBurnedEvent() {LinesBurnedCount = linesBurnedCount});
         }
 
@@ -75,9 +80,9 @@ namespace Tetris2D
         /// <returns>Result of checking</returns>
         private bool IsFullLine(int y)
         {
-            for (int x = 0; x < TetrisState.GameWidth; ++x)
+            for (int x = 0; x < GameManager.GameWidth; ++x)
             {
-                if (TetrisState.Grid[x, y] == null)
+                if (GameManager.Instance.Grid[x, y] == null)
                 {
                     return false;
                 }
@@ -92,9 +97,9 @@ namespace Tetris2D
         /// <param name="y">Y coord of line</param>
         private void DestroyLine(int y)
         {
-            for (int x = 0; x < TetrisState.GameWidth; ++x)
+            for (int x = 0; x < GameManager.GameWidth; ++x)
             {
-                Destroy(TetrisState.Grid[x, y].gameObject);
+                Destroy(GameManager.Instance.Grid[x, y].gameObject);
             }
         }
 
@@ -104,16 +109,34 @@ namespace Tetris2D
         /// <param name="yCoordOfDeletedLine">Y coord of deleted line</param>
         private void DropBlocksAbove(int yCoordOfDeletedLine)
         {
-            for (int y = yCoordOfDeletedLine + 1; y < TetrisState.GameHeight - 1; ++y)
+            for (int y = yCoordOfDeletedLine + 1; y < GameManager.GameHeight - 1; ++y)
             {
-                for (int x = 0; x < TetrisState.GameWidth; ++x)
+                for (int x = 0; x < GameManager.GameWidth; ++x)
                 {
-                    if (TetrisState.Grid[x, y] == null) continue;
-                    TetrisState.Grid[x, y].position += Vector3.down;
-                    TetrisState.Grid[x, y - 1] = TetrisState.Grid[x, y];
-                    TetrisState.Grid[x, y] = null;
+                    if (GameManager.Instance.Grid[x, y] == null) continue;
+                    GameManager.Instance.Grid[x, y].position += Vector3.down;
+                    GameManager.Instance.Grid[x, y - 1] = GameManager.Instance.Grid[x, y];
+                    GameManager.Instance.Grid[x, y] = null;
                 }
             }
+        }
+
+        /// <summary>
+        /// Check if it's top line
+        /// </summary>
+        /// <param name="y">Y coord of line</param>
+        /// <returns>result of checking</returns>
+        private bool IsTopLine(int y)
+        {
+            for (int x = 0; x < GameManager.GameWidth - 1; ++x)
+            {
+                if (GameManager.Instance.Grid[x, y] != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         #endregion

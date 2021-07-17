@@ -45,6 +45,12 @@ namespace Tetris2D
         private Text pauseText;
         
         /// <summary>
+        /// GameOverText text
+        /// </summary>
+        [SerializeField]
+        private Text gameOverText;
+        
+        /// <summary>
         /// Start game event
         /// </summary>
         public delegate void StartGameHandler();
@@ -59,23 +65,28 @@ namespace Tetris2D
             LineCleaner.onLineWasBurned += OnLineClear;
             linesWereBurnedText.text = "0";
             scoreText.text = "0";
-            levelText.text = TetrisState.CurrentLevel.ToString();
+            levelText.text = "1";
         }
 
         private void LateUpdate()
         {
-            switch (TetrisState.GameState)
+            switch (GameManager.Instance.GameState)
             {
                 case GameState.Play:
                     startButton.interactable = false;
                     pauseButton.interactable = true;
+                    gameOverText.enabled = false;
                     break;
                 case GameState.Pause:
                     break;
                 case GameState.MainMenu:
+                    startButton.interactable = true;
+                    pauseButton.interactable = false;
+                    break;
                 case GameState.End:
                     startButton.interactable = true;
                     pauseButton.interactable = false;
+                    gameOverText.enabled = true;
                     break;
                 default:
                     break;
@@ -91,7 +102,11 @@ namespace Tetris2D
         /// </summary>
         public void OnClickStart()
         {
-            TetrisState.ChangeGameState(GameState.Play);
+            GameManager.Instance.Restart();
+            linesWereBurnedText.text = "0";
+            scoreText.text = "0";
+            levelText.text = GameManager.Instance.CurrentLevel.ToString();
+            GameManager.Instance.ChangeGameState(GameState.Play);
             OnStartGame?.Invoke();
         }
 
@@ -100,17 +115,15 @@ namespace Tetris2D
         /// </summary>
         public void OnClickPause()
         {
-            if (TetrisState.GameState == GameState.Play)
+            if (GameManager.Instance.GameState == GameState.Play)
             {
                 this.pauseText.enabled = true;
-                // Time.timeScale = 0;
-                TetrisState.ChangeGameState(GameState.Pause);
+                GameManager.Instance.ChangeGameState(GameState.Pause);
             }
             else
             {
                 this.pauseText.enabled = false;
-                // Time.timeScale = 1;
-                TetrisState.ChangeGameState(GameState.Play);
+                GameManager.Instance.ChangeGameState(GameState.Play);
             }
         }
 
@@ -126,12 +139,12 @@ namespace Tetris2D
         /// <param name="e">event</param>
         private void OnLineClear(object sender, EventArgs e)
         {
-            linesWereBurnedText.text = TetrisState.LinesWereBurned.ToString();
+            linesWereBurnedText.text = GameManager.Instance.LinesWereBurned.ToString();
 
-            TetrisState.TotalScore += TetrisState.GetScoreForBurnedLines(((LinesBurnedEvent)e).LinesBurnedCount);
-            scoreText.text = TetrisState.TotalScore.ToString();
+            GameManager.Instance.TotalScore += GameManager.GetScoreForBurnedLines(((LinesBurnedEvent)e).LinesBurnedCount);
+            scoreText.text = GameManager.Instance.TotalScore.ToString();
 
-            levelText.text = TetrisState.CurrentLevel.ToString();
+            levelText.text = GameManager.Instance.CurrentLevel.ToString();
         }
 
         #endregion
